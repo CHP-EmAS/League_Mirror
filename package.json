@@ -4,7 +4,7 @@
   "description": "Connects League Client with LAN",
   "scripts": {
     "start": "tsc && node out_javascript/LeagueConnector.js",
-    "dev": "ts-node-dev --respawn src_typescript/src/LeagueConnector.ts"
+    "dev": "ts-node-dev --respawn src_typescript/src/leagueConnector.ts"
   },
   "author": "",
   "license": "ISC",

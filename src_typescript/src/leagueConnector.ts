@@ -1,8 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import ServerSocketController from "./controllers/ServerSocketController";
-import AuthController from './controllers/AuthController';
+import ServerSocketController from "./controllers/serverSocketController";
+import AuthController from './controllers/authController';
 
 const PORT = process.env.PORT || 3000;
 const VERSION = "0.8.10";

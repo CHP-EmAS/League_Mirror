@@ -1,24 +1,26 @@
 import { createServer } from "http";
-import * as SocketIO from 'socket.io' ;
-import LCSC from './LeagueClientSocketController'
+import * as SocketIO from 'socket.io';
+import LCSC from './LeagueClientSocketController';
 
 class ServerSocketController {
 
     private io?: SocketIO.Server = undefined;
     private lcsc: LCSC;
 
-    private webSocketPath: string =  "/";
+    private webSocketPath: string = "/";
     private validationFunction: (socket: SocketIO.Socket, next: Function) => void;
 
     constructor(leaguePort: number, riotBasicAuthToken: string) {
-        this.validationFunction = (socket: SocketIO.Socket, next: Function) => {return next();}
-            
+        this.validationFunction = (socket: SocketIO.Socket, next: Function) => {
+            return next();
+        };
+
         this.lcsc = new LCSC(leaguePort, riotBasicAuthToken);
     }
 
     public start() {
-        if(this.io) {
-            this.io.close; 
+        if (this.io) {
+            this.io.close();
         }
             
         const httpServer = createServer();
@@ -31,7 +33,7 @@ class ServerSocketController {
         });
 
         this.init();
-        httpServer.listen(3000)
+        httpServer.listen(3000);
 
         console.log("League Mirror Socket started!");
 
@@ -39,17 +41,16 @@ class ServerSocketController {
     }
 
     private init(): boolean {
-        if(!this.io) return false;
+        if (!this.io) return false;
 
         this.io.use(this.validationFunction);
 
         this.io.on("connection", (socket: SocketIO.Socket) => {
-            socket.emit("log",{msg: "Connected to League Mirror! ♥"})
+            socket.emit("log", {msg: "Connected to League Mirror! ♥"});
         });
 
         return true;
     }
-    
 }
 
 export default ServerSocketController;
