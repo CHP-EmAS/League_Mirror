@@ -1,4 +1,4 @@
-import {Server} from "http";
+import { createServer } from "http";
 import * as SocketIO from 'socket.io' ;
 import LCSC from './LeagueClientSocketController'
 
@@ -21,7 +21,9 @@ class ServerSocketController {
             this.io.close; 
         }
             
-        this.io = new SocketIO.Server({
+        const httpServer = createServer();
+
+        this.io = new SocketIO.Server(httpServer, {
             path: this.webSocketPath,
             cors: {
                 origin: '*',
@@ -29,6 +31,7 @@ class ServerSocketController {
         });
 
         this.init();
+        httpServer.listen(3000)
 
         console.log("League Mirror Socket started!");
 
