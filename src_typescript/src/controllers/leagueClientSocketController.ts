@@ -3,6 +3,7 @@ import GeneralRequest from "../models/leagueEventTypes/generalRequest";
 import MatchmakingSearchUpdate from "../models/leagueEventTypes/matchmakingSearchUpdate";
 import MatchmakingSearchStateUpdate from "../models/leagueEventTypes/matchmakingSearchStateUpdate";
 import ServerSocketController from "./serverSocketController";
+import QueueChangeEvent, {queueState} from "../models/queueChangeEvent";
 
 class LeagueClientSocketController {
 
@@ -53,14 +54,34 @@ class LeagueClientSocketController {
                     switch (jsonData.uri) {
                         case "/lol-matchmaking/v1/search":
                             const queueData: MatchmakingSearchUpdate = jsonData.data;
-                            this.serverSocketController.queueStateChanged(true, queueData.timeInQueue, queueData.estimatedQueueTime);
+                            this.serverSocketController.queueStateChanged({
+                                state: queueState.inQueue,
+                                timeElapsed: queueData.timeInQueue,
+                                estimatedTime: queueData.estimatedQueueTime
+                            });
                             break;
                         case "/lol-lobby/v2/lobby/matchmaking/search-state":
                             const searchData: MatchmakingSearchStateUpdate = jsonData.data;
-                            if (searchData.searchState === "Invalid") {
-                                this.serverSocketController.queueStateChanged(false, 0, 0);
+                            let queueEvent: QueueChangeEvent;
+                            switch (searchData.searchState) {
+                                case "Invalid":
+                                    queueEvent = {
+                                        state: queueState.outQueue,
+                                    };
+                                    break;
+                                case "Found":
+                                    queueEvent = {
+                                        state: queueState.found
+                                    };
+                                    break;
+                                default:
+                                    // state Searching
+                                    queueEvent = {
+                                        state: queueState.inQueue
+                                    };
+                                    break;
                             }
-
+                                this.serverSocketController.queueStateChanged(queueEvent);
                             break;
                         default:
                             console.log(data);

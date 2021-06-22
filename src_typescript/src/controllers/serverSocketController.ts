@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import * as SocketIO from 'socket.io';
 import LCSC from './LeagueClientSocketController';
+import QueueChangeEvent from "../models/queueChangeEvent";
 
 class ServerSocketController {
 
@@ -52,8 +53,8 @@ class ServerSocketController {
         return true;
     }
 
-    public queueStateChanged(inQueue: boolean, timeElapsed: number, estimatedTime: number) {
-        console.log(inQueue, timeElapsed, estimatedTime);
+    public queueStateChanged(event: QueueChangeEvent) {
+        console.log(event.state, event.timeElapsed, event.estimatedTime);
     }
 }
 
