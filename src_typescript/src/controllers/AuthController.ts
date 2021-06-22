@@ -24,7 +24,8 @@ class AuthController {
 
     return {
       port: parseInt(port[1]),
-      authToken: authToken[1]
+      authToken: authToken[1],
+      basicAuthToken: `Basic ${Buffer.from(`riot:${authToken[1]}`).toString('base64')}`
     }
   }
 }
