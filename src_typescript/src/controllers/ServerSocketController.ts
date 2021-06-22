@@ -30,7 +30,7 @@ class ServerSocketController {
 
         this.init();
 
-        console.log("League Mirror Socket started...");
+        console.log("League Mirror Socket started!");
 
         this.lcsc.start();
     }

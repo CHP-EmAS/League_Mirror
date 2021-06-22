@@ -22,6 +22,9 @@ class AuthController {
       throw new Error("Could not parse app port");
     }
 
+    console.log("League Client Port: " + port[1]);
+    console.log("League Client Auth: " + authToken[1]);
+
     return {
       port: parseInt(port[1]),
       authToken: authToken[1],

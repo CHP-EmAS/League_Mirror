@@ -25,8 +25,6 @@ class LeagueClientSocketController {
         });
 
         this.init();
-
-        console.log("League Mirror Socket started...");
     }
 
     private init(): boolean {
