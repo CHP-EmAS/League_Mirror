@@ -15,14 +15,14 @@ class ServerSocketController {
             return next();
         };
 
-        this.lcsc = new LCSC(leaguePort, riotBasicAuthToken);
+        this.lcsc = new LCSC(leaguePort, riotBasicAuthToken, this);
     }
 
     public start() {
         if (this.io) {
             this.io.close();
         }
-            
+
         const httpServer = createServer();
 
         this.io = new SocketIO.Server(httpServer, {
@@ -50,6 +50,10 @@ class ServerSocketController {
         });
 
         return true;
+    }
+
+    public queueStateChanged(inQueue: boolean, timeElapsed: number, estimatedTime: number) {
+        console.log(inQueue, timeElapsed, estimatedTime);
     }
 }
 

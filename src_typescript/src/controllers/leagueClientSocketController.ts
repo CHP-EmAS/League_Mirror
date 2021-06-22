@@ -1,20 +1,26 @@
 import WebSocket from 'ws';
+import GeneralRequest from "../models/leagueEventTypes/generalRequest";
+import MatchmakingSearchUpdate from "../models/leagueEventTypes/matchmakingSearchUpdate";
+import MatchmakingSearchStateUpdate from "../models/leagueEventTypes/matchmakingSearchStateUpdate";
+import ServerSocketController from "./serverSocketController";
 
 class LeagueClientSocketController {
 
     private webSocket?: WebSocket = undefined;
 
-    private leaguePort: number;
-    private riotBasicAuthToken: string;
+    private readonly leaguePort: number;
+    private readonly riotBasicAuthToken: string;
+    private readonly serverSocketController: ServerSocketController;
 
-    constructor(leaguePort: number, riotBasicAuthToken: string) {
+    constructor(leaguePort: number, riotBasicAuthToken: string, serverSocketController: ServerSocketController) {
         this.leaguePort = leaguePort;
         this.riotBasicAuthToken = riotBasicAuthToken;
+        this.serverSocketController = serverSocketController;
     }
 
     public start() {
-        
-        if(this.webSocket)
+
+        if (this.webSocket)
             this.webSocket.close();
 
         this.webSocket = new WebSocket(`wss://127.0.0.1:${this.leaguePort}/`, "wamp", {
@@ -28,27 +34,48 @@ class LeagueClientSocketController {
     }
 
     private init(): boolean {
-        if(!this.webSocket) return false;
+        if (!this.webSocket) return false;
 
         this.webSocket.on('open', function open() {
             console.log('Connected to League Client! ♥');
             this.send("[5,\"OnJsonApiEvent\"]");
         });
-          
+
         this.webSocket.on('close', function close() {
             console.log('Disconnectet from League Client! :(');
         });
-          
-        this.webSocket.on('message', function incoming(data) {
-            //TODO
-            console.log(data);
+
+        this.webSocket.on('message', data => {
+            // TODO
+            const jsonData: GeneralRequest = JSON.parse(data.toString())[2];
+            switch (jsonData.eventType) {
+                case "Update":
+                    switch (jsonData.uri) {
+                        case "/lol-matchmaking/v1/search":
+                            const queueData: MatchmakingSearchUpdate = jsonData.data;
+                            this.serverSocketController.queueStateChanged(true, queueData.timeInQueue, queueData.estimatedQueueTime);
+                            break;
+                        case "/lol-lobby/v2/lobby/matchmaking/search-state":
+                            const searchData: MatchmakingSearchStateUpdate = jsonData.data;
+                            if (searchData.searchState === "Invalid") {
+                                this.serverSocketController.queueStateChanged(false, 0, 0);
+                            }
+
+                            break;
+                        default:
+                            console.log(data);
+                    }
+                    break;
+                default:
+                    console.log(data);
+            }
         });
 
         this.webSocket.addEventListener('error', (err) => console.log(err.message));
 
         return true;
     }
-    
+
 }
 
 export default LeagueClientSocketController;
