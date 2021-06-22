@@ -1,7 +1,7 @@
 interface AuthInformation {
   port: number;
   authToken: string;
-  basicAuthToken: string
+  basicAuthToken: string;
 }
 
-export default AuthInformation
+export default AuthInformation;
