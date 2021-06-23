@@ -10,7 +10,7 @@ export default class HttpRequestController {
 
         switch (method.toUpperCase()) {
             case 'POST':
-                await axios.post(url, {
+                await axios.post(url, null, {
                     httpsAgent: agent,
                     auth: {
                         username: "riot",
