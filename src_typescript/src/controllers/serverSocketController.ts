@@ -53,12 +53,12 @@ class ServerSocketController {
         this.io.on("connection", (socket: socketIO.Socket) => {
             console.log("Remote Device connected!");
             socket.emit("log", "Connected to League Mirror! ♥");
-        });
 
-        this.io.on("command", async (data: string) => {
-            const command: SocketCommand = JSON.parse(data);
-            console.log(command);
-            await HttpRequestController.makeRequest(`http://127.0.0.1:${this.leaguePort}${command.uri}`, this.basicAuthToken, command.method);
+            socket.on("command", async (data: string) => {
+                const command: SocketCommand = JSON.parse(data);
+                console.log(command);
+                await HttpRequestController.makeRequest(`http://127.0.0.1:${this.leaguePort}${command.uri}`, this.basicAuthToken, command.method);
+            });
         });
 
         return true;
