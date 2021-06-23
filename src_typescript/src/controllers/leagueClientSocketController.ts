@@ -90,11 +90,11 @@ class LeagueClientSocketController {
                             this.serverSocketController.queueStateChanged(queueEvent);
                             break;
                         default:
-                            console.log(data);
+                           // console.log(data);
                     }
                     break;
                 default:
-                    console.log(data);
+                   // console.log(data);
             }
         });
 
