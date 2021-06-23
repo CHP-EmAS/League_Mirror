@@ -1,18 +1,24 @@
-import { createServer } from "http";
+import {createServer} from "http";
 import socketIO from 'socket.io';
 import LCSC from './LeagueClientSocketController';
 import QueueChangeEvent from "../models/queueChangeEvent";
+import SocketCommand from "../models/socketCommand";
+import HttpRequestController from "./httpRequestController";
 
 class ServerSocketController {
 
-    private io?: SocketIO.Server = undefined;
+    private io?: socketIO.Server = undefined;
     private lcsc: LCSC;
+    private readonly basicAuthToken: string;
+    private readonly leaguePort: number;
 
     private webSocketPath: string = "/";
-    private validationFunction: (socket: SocketIO.Socket, next: Function) => void;
+    private readonly validationFunction: (socket: socketIO.Socket, next: Function) => void;
 
     constructor(leaguePort: number, riotBasicAuthToken: string) {
-        this.validationFunction = (socket: SocketIO.Socket, next: Function) => {
+        this.basicAuthToken = riotBasicAuthToken;
+        this.leaguePort = leaguePort;
+        this.validationFunction = (socket: socketIO.Socket, next: Function) => {
             return next();
         };
 
@@ -28,7 +34,7 @@ class ServerSocketController {
 
         this.io = socketIO(httpServer, {
             path: this.webSocketPath,
-            handlePreflightRequest: this.handlePreflightRequest
+            handlePreflightRequest: ServerSocketController.handlePreflightRequest
         });
 
         this.init();
@@ -44,18 +50,23 @@ class ServerSocketController {
 
         this.io.use(this.validationFunction);
 
-        this.io.on("connection", (socket: SocketIO.Socket) => {
-            console.log("Remote Divice connected!");
+        this.io.on("connection", (socket: socketIO.Socket) => {
+            console.log("Remote Device connected!");
             socket.emit("log", "Connected to League Mirror! ♥");
+        });
+
+        this.io.on("command", async (data: SocketCommand) => {
+            console.log(data);
+            await HttpRequestController.makeRequest(`127.0.0.1:${this.leaguePort}${data.uri}`, this.basicAuthToken, data.method);
         });
 
         return true;
     }
 
-    private handlePreflightRequest(request: any, response: any) {
+    private static handlePreflightRequest(request: any, response: any) {
         const headers = {
             "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, user-token",
-            "Access-Control-Allow-Origin": request.headers.origin, 
+            "Access-Control-Allow-Origin": request.headers.origin,
             "Access-Control-Allow-Credentials": true
         };
         response.writeHead(200, headers);
