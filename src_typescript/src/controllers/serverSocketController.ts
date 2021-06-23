@@ -57,7 +57,7 @@ class ServerSocketController {
             socket.on("command", async (data: string) => {
                 const command: SocketCommand = JSON.parse(data);
                 console.log(command);
-                await HttpRequestController.makeRequest(`http://127.0.0.1:${this.leaguePort}${command.uri}`, this.basicAuthToken, command.method);
+                await HttpRequestController.makeRequest(`https://127.0.0.1:${this.leaguePort}${command.uri}`, this.basicAuthToken, command.method);
             });
         });
 
