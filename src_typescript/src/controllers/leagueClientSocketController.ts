@@ -54,6 +54,7 @@ class LeagueClientSocketController {
                     switch (jsonData.uri) {
                         case "/lol-matchmaking/v1/search":
                             const queueData: MatchmakingSearchUpdate = jsonData.data;
+                            console.log(queueData);
                             this.serverSocketController.queueStateChanged({
                                 state: queueState.inQueue,
                                 timeElapsed: queueData.timeInQueue,
@@ -62,6 +63,7 @@ class LeagueClientSocketController {
                             break;
                         case "/lol-lobby/v2/lobby/matchmaking/search-state":
                             const searchData: MatchmakingSearchStateUpdate = jsonData.data;
+                            console.log(searchData);
                             let queueEvent: QueueChangeEvent;
                             switch (searchData.searchState) {
                                 case "Invalid":
