@@ -46,7 +46,7 @@ class ServerSocketController {
 
         this.io.on("connection", (socket: SocketIO.Socket) => {
             console.log("Remote Divice connected!");
-            socket.emit("log", {msg: "Connected to League Mirror! ♥"});
+            socket.emit("log", "Connected to League Mirror! ♥");
         });
 
         return true;
@@ -63,6 +63,10 @@ class ServerSocketController {
     }
 
     public queueStateChanged(event: QueueChangeEvent) {
+        if (!this.io) return;
+
+        this.io.emit("queueEvent", JSON.stringify(event));
+
         console.log(event.state, event.timeElapsed, event.estimatedTime);
     }
 }
