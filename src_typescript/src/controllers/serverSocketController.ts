@@ -1,5 +1,5 @@
 import { createServer } from "http";
-import * as SocketIO from 'socket.io';
+import socketIO from 'socket.io';
 import LCSC from './LeagueClientSocketController';
 import QueueChangeEvent from "../models/queueChangeEvent";
 
@@ -26,17 +26,15 @@ class ServerSocketController {
 
         const httpServer = createServer();
 
-        this.io = new SocketIO.Server(httpServer, {
+        this.io = socketIO(httpServer, {
             path: this.webSocketPath,
-            cors: {
-                origin: '*',
-            }
+            handlePreflightRequest: this.handlePreflightRequest
         });
 
         this.init();
-        httpServer.listen(3000);
-
-        console.log("League Mirror Socket started!");
+        httpServer.listen(5000, "0.0.0.0", () => {
+            console.log("League Mirror Socket started!");
+        });
 
         this.lcsc.start();
     }
@@ -47,10 +45,21 @@ class ServerSocketController {
         this.io.use(this.validationFunction);
 
         this.io.on("connection", (socket: SocketIO.Socket) => {
+            console.log("Remote Divice connected!");
             socket.emit("log", {msg: "Connected to League Mirror! ♥"});
         });
 
         return true;
+    }
+
+    private handlePreflightRequest(request: any, response: any) {
+        const headers = {
+            "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, user-token",
+            "Access-Control-Allow-Origin": request.headers.origin, 
+            "Access-Control-Allow-Credentials": true
+        };
+        response.writeHead(200, headers);
+        response.end();
     }
 
     public queueStateChanged(event: QueueChangeEvent) {
