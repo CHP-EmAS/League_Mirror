@@ -4,25 +4,24 @@ import LCSC from './LeagueClientSocketController';
 import QueueChangeEvent from "../models/queueChangeEvent";
 import SocketCommand from "../models/socketCommand";
 import HttpRequestController from "./httpRequestController";
+import AuthInformation from "../models/authInformation";
 
 class ServerSocketController {
 
     private io?: socketIO.Server = undefined;
     private lcsc: LCSC;
-    private readonly basicAuthToken: string;
-    private readonly leaguePort: number;
+    private readonly authInfo: AuthInformation;
 
     private webSocketPath: string = "/";
     private readonly validationFunction: (socket: socketIO.Socket, next: Function) => void;
 
-    constructor(leaguePort: number, riotBasicAuthToken: string) {
-        this.basicAuthToken = riotBasicAuthToken;
-        this.leaguePort = leaguePort;
+    constructor(authInfo: AuthInformation) {
+        this.authInfo = authInfo;
         this.validationFunction = (socket: socketIO.Socket, next: Function) => {
             return next();
         };
 
-        this.lcsc = new LCSC(leaguePort, riotBasicAuthToken, this);
+        this.lcsc = new LCSC(authInfo.port, authInfo.basicAuthToken, this);
     }
 
     public start() {
@@ -43,6 +42,7 @@ class ServerSocketController {
         });
 
         this.lcsc.start();
+        HttpRequestController.makeRequest(`https://127.0.0.1:${this.authInfo.port}/Help`, this.authInfo, "GET");
     }
 
     private init(): boolean {
@@ -57,7 +57,7 @@ class ServerSocketController {
             socket.on("command", async (data: string) => {
                 const command: SocketCommand = JSON.parse(data);
                 console.log(command);
-                await HttpRequestController.makeRequest(`https://127.0.0.1:${this.leaguePort}${command.uri}`, this.basicAuthToken, command.method);
+                HttpRequestController.makeRequest(`https://127.0.0.1:${this.authInfo.port}${command.uri}`, this.authInfo, command.method);
             });
         });
 

@@ -15,7 +15,7 @@ console.log(" ");
 
 AuthController.getAuthenticationInformation().then(leagueInfo => {
     console.log(" ");
-    const serverSocket = new ServerSocketController(leagueInfo.port, leagueInfo.basicAuthToken);
+    const serverSocket = new ServerSocketController(leagueInfo);
     serverSocket.start();
 }).catch(error => {
     console.log("FATAL ERROR: " + error);

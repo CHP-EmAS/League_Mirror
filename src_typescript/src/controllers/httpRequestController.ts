@@ -1,26 +1,29 @@
 import * as https from 'https';
 import axios from 'axios';
+import AuthInformation from "../models/authInformation";
 
 export default class HttpRequestController {
-    public static async makeRequest(url: string, basicAuthToken: string, method: string) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    public static async makeRequest(url: string, authInfo: AuthInformation, method: string) {
         const agent = new https.Agent({
             rejectUnauthorized: false
         });
-        axios.defaults.httpsAgent = agent;
 
         switch (method.toUpperCase()) {
             case 'POST':
                 await axios.post(url, {
-                    headers: {
-                        Authorization: basicAuthToken
+                    httpsAgent: agent,
+                    auth: {
+                        username: "riot",
+                        password: authInfo.authToken
                     }
                 });
                 break;
             case 'GET':
-                await axios.post(url, {
-                    headers: {
-                        Authorization: basicAuthToken
+                await axios.post(url, null, {
+                    httpsAgent: agent,
+                    auth: {
+                        username: "riot",
+                        password: authInfo.authToken
                     }
                 });
                 break;
