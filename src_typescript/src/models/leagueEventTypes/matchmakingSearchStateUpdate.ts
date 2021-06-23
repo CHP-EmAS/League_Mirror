@@ -1,7 +1,15 @@
 export default interface MatchmakingSearchStateUpdate {
-    errors: any[];
+    errors: Error[];
     lowPriorityData: LowPriorityData;
     searchState: string;
+}
+
+interface Error {
+    id: number;
+    errorType: string;
+    message: string;
+    penalizedSummonerId: number;
+    penaltyTimeRemaining: number;
 }
 
 interface LowPriorityData {

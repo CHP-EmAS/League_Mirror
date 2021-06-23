@@ -1,7 +1,7 @@
 interface MatchmakingSearchUpdate {
     dodgeData: DodgeData;
     estimatedQueueTime: number;
-    errors: any[];
+    errors: Error[];
     isCurrentlyInQueue: boolean;
     lobbyId: string;
     lowPriorityData: LowPriorityData;
@@ -14,6 +14,14 @@ interface MatchmakingSearchUpdate {
 interface DodgeData {
     dodgerId: number;
     state: string;
+}
+
+interface Error {
+    id: number;
+    errorType: string;
+    message: string;
+    penalizedSummonerId: number;
+    penaltyTimeRemaining: number;
 }
 
 interface LowPriorityData {
