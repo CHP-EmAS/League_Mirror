@@ -2,7 +2,18 @@
   "name": "league_connector",
   "version": "1.0.0",
   "description": "Connects League Client with LAN",
+  "bin": "out_javascript/src/LeagueConnector.js",
+  "pkg": {
+    "assets": [
+      "node_modules/**/*",
+      "out_javascript/**/*"
+    ],
+    "targets": [
+      "node10-win-x64"
+    ]
+  },
   "scripts": {
+    "build": "tsc && pkg --output build/server .",
     "start": "tsc && node out_javascript/LeagueConnector.js",
     "dev": "ts-node-dev --respawn src_typescript/src/leagueConnector.ts"
   },
@@ -24,6 +35,7 @@
     "@types/socket.io": "^2.1.4",
     "@types/socket.io-client": "^3.0.0",
     "@types/ws": "^7.4.5",
+    "pkg": "^5.3.0",
     "rimraf": "^3.0.2",
     "ts-node-dev": "^1.1.6",
     "tslint": "^6.1.3",
